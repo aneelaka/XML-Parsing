@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html>
+    <style>
+    h1
+        {
+            text-align: center;
+        }
+        body
+        {
+            text-align: center;
+        }
+    </style>
+    <head></head>
+    <title>table</title>
+    <body>
+        <form style="text-align:center;">
+        <h1> Enter URL for Newspaper List XML File</h1>
+    <br>
+    <br>
+    
+    <input type="text" name="URL"> 
+            <br>
+    <br>
+    <input type="button" onclick="load(this.form)" value="submit">
+           
+            
+    </form>
+        
+    <script>
+    
+        function load(val)
+        { 
+            var xmlDoc,xhttp,url,win,filetext;
+            url=val.URL.value;
+            if(url=="")
+            {
+              alert("URL not entered!!");
+            }
+            else
+            {
+             xhttp=new XMLHttpRequest();
+                
+             xhttp.onreadystatechange = function() 
+                  {
+                                 
+                   if (xhttp.readyState == 4) 
+                    {                        
+                    if(xhttp.status == 200)                         
+                    {
+                        noError(xhttp); 
+                    }
+                       else if(xhttp.status==404)
+                           {
+                               alert("File not found!");
+                           }
+                    }
+                  
+                     
+                   };       
+                xhttp.open("GET",url, false);
+        try
+        {
+            xhttp.send();
+        }
+                catch(err)
+                    {
+                        alert("File not found");
+                    }
+            }
+        }
+                function noError(xhttp)
+                {
+                    xmlDoc=xhttp.responseXML;
+          if(xmlDoc.documentElement.nodeName=="parsererror")
+            {
+              alert("Error in File"); 
+                
+            } 
+                    else
+            {         
+             
+            xmlDoc.onload=generateHTML(xmlDoc);  
+            
+            }
+          
+                }
+              
+            
+            function generateHTML(xmlDoc)
+            {
+                
+                var rows=xmlDoc.getElementsByTagName("Row");
+                if(rows.length==0)
+                    {
+                        alert("No newspaper information");
+                        
+                    }
+                else{
+                var j,html_text;
+                var r= xmlDoc.getElementsByTagName("Newspaper");
+                    html_text="<html><head></head><body><table border=1 width=50% height=500><tr>"
+                
+             header=xmlDoc.getElementsByTagName("Data");
+                for(j=0;j<header.length;j++)
+                    {
+                        html_text+="<th>"
+                        html_text+=xmlDoc.getElementsByTagName("Data")[j].childNodes[0].nodeValue
+                        html_text+=("</th>")
+                    }
+                html_text+=("</tr>");
+                var i;
+           for(i=0;i<r.length;i++)
+            {
+                
+                html_text+="<tr><td>"
+                html_text+=(i+1)
+                html_text+=("</td><td>")
+                html_text+=xmlDoc.getElementsByTagName("Newspaper")[i].childNodes[0].nodeValue;
+                html_text+=("</td><td>");
+                html_text+="<ul>";
+                if(xmlDoc.getElementsByTagName("City")[i].childNodes[0]==null || xmlDoc.getElementsByTagName("City")[i].childNodes[0]==undefined)
+                    {
+                        html_text+="";
+                
+                    }
+                else{ 
+                    html_text+="<li>";
+                html_text+=xmlDoc.getElementsByTagName("City")[i].childNodes[0].nodeValue;
+                html_text+="</li>";
+                }
+                if(xmlDoc.getElementsByTagName("State")[i].childNodes[0]==null || xmlDoc.getElementsByTagName("State")[i].childNodes[0]==undefined)
+                    {
+                       html_text+="";
+                    }
+                else{
+                    html_text+="<li>";
+                html_text+=xmlDoc.getElementsByTagName("State")[i].childNodes[0].nodeValue;
+                html_text+="</li>";
+                }
+                html_text+="</ul>";
+                html_text+="</td><td>";
+                if(xmlDoc.getElementsByTagName("HomePage")[i].childNodes[0]==null || xmlDoc.getElementsByTagName("HomePage")[i].childNodes[0]==undefined)
+                    {
+                        html_text+="";
+                    }
+                else
+                    {
+                html_text+="<a href=\"";
+                html_text+=xmlDoc.getElementsByTagName("HomePage")[i].childNodes[0].nodeValue;
+                html_text+="\">";
+                html_text+=xmlDoc.getElementsByTagName("HomePage")[i].childNodes[0].nodeValue;
+                html_text+="</a";
+                    }
+                html_text+="</td><td>";
+                if(xmlDoc.getElementsByTagName("Logo")[i].childNodes[0]==null || xmlDoc.getElementsByTagName("Logo")[i].childNodes[0]==undefined)
+                    {
+                        html_text+="";
+                    }
+                else{
+                html_text+="<img src=\"";
+                html_text+=xmlDoc.getElementsByTagName("Logo")[i].childNodes[0].nodeValue;
+                html_text+="\">";
+                }
+                html_text+="</td></tr>";
+                
+            }
+        html_text+="</table></body><noscript></noscript></html>";
+                    w=window.open("","XML DATA","height=600,width=900,scrollbars=yes");  
+                   w.document.body.innerHTML="";         
+                   w.document.write(html_text);
+            
+        }
+        
+            
+            }
+        
+    </script>
+
+    <noscript></noscript>
+    </body>
+</html>
